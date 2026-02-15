@@ -14,6 +14,16 @@ module StarRealms
   #
   class LogParser
     STARTING_AUTHORITY = 50
+    STARTING_DECK = { neutral: 10, blob: 0, machine_cult: 0, star_empire: 0, trade_federation: 0 }.freeze
+
+    # Faction color mapping
+    FACTION_COLORS = {
+      "#800080" => :neutral,         # Purple - Scouts, Vipers, Explorers
+      "#4CC417" => :blob,            # Green
+      "#FF0000" => :machine_cult,    # Red
+      "#FFFF00" => :star_empire,     # Yellow
+      "#1589FF" => :trade_federation # Blue
+    }.freeze
 
     # Regex patterns for parsing
     TURN_START = /It is now (?<player>.+)'s turn (?<turn>\d+)/
@@ -28,6 +38,10 @@ module StarRealms
     # Mission completion: "Revealed {MissionName}"
     # Known missions: Exterminate, Ally, Convert, Influence, Dominate, Rule, Unite, Colonize, Defend, Diversify, Armada
     MISSION_REVEALED = /Revealed (?<mission>Exterminate|Ally|Convert|Influence|Dominate|Rule|Unite|Colonize|Defend|Diversify|Armada)/
+    # Card acquisition: "Acquired <color=#XXXXXX>Card Name</color>"
+    CARD_ACQUIRED = /Acquired <color=(?<color>#[0-9A-Fa-f]{6})>(?<card>.+?)<\/color>/
+    # Card scrapped: "Scrapped <color=#XXXXXX>Card Name</color>"
+    CARD_SCRAPPED = /Scrapped <color=(?<color>#[0-9A-Fa-f]{6})>(?<card>.+?)<\/color>/
 
     def self.parse(log_text)
       new(log_text).parse
@@ -40,6 +54,8 @@ module StarRealms
       @authority = {}
       @authority_by_turn = {}
       @missions_by_turn = {}
+      @deck = {}
+      @deck_by_turn = {}
       @winner = nil
       @current_turn = 0
       @max_turn = 0
@@ -48,7 +64,7 @@ module StarRealms
 
     def parse
       identify_players
-      initialize_authority
+      initialize_state
       parse_events
 
       GameResult.new(
@@ -56,7 +72,8 @@ module StarRealms
         authority_by_turn: @authority_by_turn,
         winner: @winner,
         total_turns: @max_turn,
-        missions_by_turn: @missions_by_turn
+        missions_by_turn: @missions_by_turn,
+        deck_by_turn: @deck_by_turn
       )
     end
 
@@ -80,11 +97,13 @@ module StarRealms
       end
     end
 
-    def initialize_authority
+    def initialize_state
       @players.each do |player|
         @authority[player] = STARTING_AUTHORITY
         @authority_by_turn[player] = [[0, STARTING_AUTHORITY]]
         @missions_by_turn[player] = []
+        @deck[player] = STARTING_DECK.dup
+        @deck_by_turn[player] = [[0, STARTING_DECK.dup]]
       end
       # First player starts turn 1
       @current_player = @players.first
@@ -100,16 +119,29 @@ module StarRealms
     def parse_line(line)
       stripped = line.strip
 
-      # Check for winner - snapshot final authority state
+      # Check for winner - snapshot final state
       if (match = stripped.match(WINNER))
         @winner = match[:player]
-        snapshot_authority(@max_turn)
+        snapshot_state(@max_turn)
         return
       end
 
       # Check for mission completion (in mission game mode)
       if (match = stripped.match(MISSION_REVEALED))
         record_mission(match[:mission])
+        return
+      end
+
+      # Check for card acquisition (only action lines - no leading whitespace)
+      # Effect lines like "Acquired X to the top of the deck" are tab-indented
+      if !line.start_with?("\t") && (match = stripped.match(CARD_ACQUIRED))
+        record_card_acquired(match[:color], match[:card])
+        return
+      end
+
+      # Check for card scrapped (effect lines are tab-indented, we count those)
+      if (match = stripped.match(CARD_SCRAPPED))
+        record_card_scrapped(match[:color], match[:card])
         return
       end
 
@@ -139,12 +171,12 @@ module StarRealms
         return
       end
 
-      # Check for turn end (snapshot authority at end of turn)
+      # Check for turn end (snapshot state at end of turn)
       if (match = line.match(TURN_END))
         @current_turn = match[:turn].to_i
         @current_player = match[:player]
         @max_turn = @current_turn if @current_turn > @max_turn
-        snapshot_authority
+        snapshot_state
       end
     end
 
@@ -160,9 +192,24 @@ module StarRealms
       @missions_by_turn[@current_player] << [@current_turn, mission_name]
     end
 
-    def snapshot_authority(turn = @current_turn)
+    def record_card_acquired(color, _card_name)
+      return unless @current_player && @deck.key?(@current_player)
+
+      faction = FACTION_COLORS[color] || :neutral
+      @deck[@current_player][faction] += 1
+    end
+
+    def record_card_scrapped(color, _card_name)
+      return unless @current_player && @deck.key?(@current_player)
+
+      faction = FACTION_COLORS[color] || :neutral
+      @deck[@current_player][faction] -= 1
+    end
+
+    def snapshot_state(turn = @current_turn)
       @players.each do |player|
         @authority_by_turn[player] << [turn, @authority[player]]
+        @deck_by_turn[player] << [turn, @deck[player].dup]
       end
     end
   end

@@ -292,6 +292,89 @@ module StarRealms
     end
   end
 
+  class LogParserDeckTrackingTest < ActiveSupport::TestCase
+    def setup
+      @log_text = file_fixture("sample_game.log").read
+      @result = LogParser.parse(@log_text)
+    end
+
+    test "both players start with 10 neutral cards" do
+      heofty_deck = @result.deck_by_turn["Heofty"].first
+      ideas_deck = @result.deck_by_turn["ideasasylum"].first
+
+      assert_equal 0, heofty_deck[0]
+      assert_equal({ neutral: 10, blob: 0, machine_cult: 0, star_empire: 0, trade_federation: 0 }, heofty_deck[1])
+
+      assert_equal 0, ideas_deck[0]
+      assert_equal({ neutral: 10, blob: 0, machine_cult: 0, star_empire: 0, trade_federation: 0 }, ideas_deck[1])
+    end
+
+    test "tracks acquisitions by faction for Heofty" do
+      heofty_decks = @result.deck_by_turn["Heofty"]
+
+      # Turn 1: acquired Trade Hauler (Trade Federation)
+      turn_1 = heofty_decks.find { |t, _| t == 1 }&.last
+      assert_equal 1, turn_1[:trade_federation]
+
+      # Turn 3: acquired Knightstar (Star Empire)
+      turn_3 = heofty_decks.find { |t, _| t == 3 }&.last
+      assert_equal 1, turn_3[:star_empire]
+
+      # Turn 5: acquired 2x Explorer (Neutral)
+      turn_5 = heofty_decks.find { |t, _| t == 5 }&.last
+      assert_equal 12, turn_5[:neutral]
+    end
+
+    test "tracks scraps reducing deck count" do
+      # Turn 13: Heofty scraps a Scout
+      heofty_decks = @result.deck_by_turn["Heofty"]
+      turn_13 = heofty_decks.find { |t, _| t == 13 }&.last
+      assert_equal 12, turn_13[:neutral]  # Started with 13 neutral by turn 11, scrapped 1
+
+      # Turn 15: Heofty scraps an Explorer
+      turn_15 = heofty_decks.find { |t, _| t == 15 }&.last
+      assert_equal 11, turn_15[:neutral]  # Down from 12
+    end
+
+    test "final deck composition for Heofty" do
+      # Heofty's final deck after turn 15
+      final_deck = @result.final_deck("Heofty")
+
+      assert_equal 11, final_deck[:neutral]
+      assert_equal 1, final_deck[:blob]
+      assert_equal 2, final_deck[:machine_cult]
+      assert_equal 4, final_deck[:star_empire]
+      assert_equal 1, final_deck[:trade_federation]
+    end
+
+    test "final deck composition for ideasasylum" do
+      # ideasasylum's final deck at game end (turn 16)
+      final_deck = @result.final_deck("ideasasylum")
+
+      assert_equal 7, final_deck[:neutral]
+      assert_equal 4, final_deck[:blob]
+      assert_equal 2, final_deck[:machine_cult]
+      assert_equal 4, final_deck[:star_empire]
+      assert_equal 0, final_deck[:trade_federation]
+    end
+
+    test "final_deck_size returns total cards" do
+      assert_equal 19, @result.final_deck_size("Heofty")
+      assert_equal 17, @result.final_deck_size("ideasasylum")
+    end
+
+    test "tracks multiple scraps in same turn" do
+      # Turn 12: ideasasylum scraps 3 Scouts
+      ideas_decks = @result.deck_by_turn["ideasasylum"]
+      turn_10 = ideas_decks.find { |t, _| t == 10 }&.last
+      turn_12 = ideas_decks.find { |t, _| t == 12 }&.last
+
+      # Turn 10 had 11 neutral, Turn 12 acquired 1 neutral (Confessor Morris) and scrapped 3
+      assert_equal 11, turn_10[:neutral]
+      assert_equal 9, turn_12[:neutral]  # 11 + 1 - 3 = 9
+    end
+  end
+
   class LogParserGame4MissionsTest < ActiveSupport::TestCase
     def setup
       @log_text = file_fixture("sample_game_4.log").read

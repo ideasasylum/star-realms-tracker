@@ -58,12 +58,67 @@
       <canvas id="authorityChart"></canvas>
     </div>
 
+    <div class="chart-container">
+      <canvas id="deckSizeChart"></canvas>
+    </div>
+
+    <div class="deck-composition">
+      <h2>Final Deck Composition</h2>
+      <div class="deck-grid">
+        <% @result.players.each do |player| %>
+          <% deck = @result.final_deck(player) %>
+          <% if deck %>
+            <div class="player-deck">
+              <div class="player-name"><%= player %></div>
+              <div class="deck-total"><%= @result.final_deck_size(player) %> cards</div>
+              <div class="faction-bars">
+                <% total = @result.final_deck_size(player).to_f %>
+                <% if deck[:trade_federation] > 0 %>
+                  <div class="faction-bar trade-federation" style="width: <%= (deck[:trade_federation] / total * 100).round(1) %>%" title="Trade Federation: <%= deck[:trade_federation] %>">
+                    <span class="faction-count"><%= deck[:trade_federation] %></span>
+                  </div>
+                <% end %>
+                <% if deck[:blob] > 0 %>
+                  <div class="faction-bar blob" style="width: <%= (deck[:blob] / total * 100).round(1) %>%" title="Blob: <%= deck[:blob] %>">
+                    <span class="faction-count"><%= deck[:blob] %></span>
+                  </div>
+                <% end %>
+                <% if deck[:star_empire] > 0 %>
+                  <div class="faction-bar star-empire" style="width: <%= (deck[:star_empire] / total * 100).round(1) %>%" title="Star Empire: <%= deck[:star_empire] %>">
+                    <span class="faction-count"><%= deck[:star_empire] %></span>
+                  </div>
+                <% end %>
+                <% if deck[:machine_cult] > 0 %>
+                  <div class="faction-bar machine-cult" style="width: <%= (deck[:machine_cult] / total * 100).round(1) %>%" title="Machine Cult: <%= deck[:machine_cult] %>">
+                    <span class="faction-count"><%= deck[:machine_cult] %></span>
+                  </div>
+                <% end %>
+                <% if deck[:neutral] > 0 %>
+                  <div class="faction-bar neutral" style="width: <%= (deck[:neutral] / total * 100).round(1) %>%" title="Neutral: <%= deck[:neutral] %>">
+                    <span class="faction-count"><%= deck[:neutral] %></span>
+                  </div>
+                <% end %>
+              </div>
+              <div class="faction-legend">
+                <% if deck[:trade_federation] > 0 %><span class="legend-item trade-federation">TF</span><% end %>
+                <% if deck[:blob] > 0 %><span class="legend-item blob">Blob</span><% end %>
+                <% if deck[:star_empire] > 0 %><span class="legend-item star-empire">SE</span><% end %>
+                <% if deck[:machine_cult] > 0 %><span class="legend-item machine-cult">MC</span><% end %>
+                <% if deck[:neutral] > 0 %><span class="legend-item neutral">N</span><% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
     <%= content_tag :script, nil,
           type: "module",
           data: {
             chart_data: @result.authority_by_turn.to_json,
             players: @result.players.to_json,
-            missions: @result.missions_by_turn.to_json
+            missions: @result.missions_by_turn.to_json,
+            deck_size: @result.deck_size_by_turn.to_json
           },
           id: "chart-data" %>
 
@@ -76,13 +131,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script>
-  function initChart() {
+  function initCharts() {
     const dataEl = document.getElementById("chart-data");
     if (dataEl && !dataEl.dataset.chartInitialized) {
       dataEl.dataset.chartInitialized = "true";
       const chartData = JSON.parse(dataEl.dataset.chartData);
       const players = JSON.parse(dataEl.dataset.players);
       const missions = JSON.parse(dataEl.dataset.missions);
+      const deckSizeData = JSON.parse(dataEl.dataset.deckSize);
 
       // Neon colors for space theme
       const colors = ["#00d4ff", "#ff4444"];
@@ -222,12 +278,97 @@
           }
         }
       });
+
+      // Deck Size Chart
+      const deckDatasets = players.map((player, index) => {
+        const playerData = deckSizeData[player];
+        return {
+          label: player,
+          data: playerData.map(([turn, size]) => ({ x: turn, y: size })),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          fill: false,
+          tension: 0.1,
+          borderWidth: 2,
+          pointBackgroundColor: colors[index % colors.length],
+          pointBorderColor: colors[index % colors.length],
+          pointRadius: 4,
+          pointHoverRadius: 6
+        };
+      });
+
+      const deckCtx = document.getElementById("deckSizeChart").getContext("2d");
+      new Chart(deckCtx, {
+        type: "line",
+        data: { datasets: deckDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: "Deck Size Over Time",
+              color: "#e0e0e0",
+              font: { size: 16, weight: "normal" }
+            },
+            legend: {
+              position: "top",
+              labels: {
+                color: "#e0e0e0"
+              }
+            },
+            tooltip: {
+              backgroundColor: "rgba(20, 20, 35, 0.9)",
+              titleColor: "#fff",
+              bodyColor: "#e0e0e0",
+              borderColor: "rgba(0, 212, 255, 0.5)",
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.raw.y} cards`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: "linear",
+              title: {
+                display: true,
+                text: "Turn",
+                color: "#888"
+              },
+              ticks: {
+                stepSize: 1,
+                color: "#888"
+              },
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)"
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: "Cards",
+                color: "#888"
+              },
+              ticks: {
+                color: "#888"
+              },
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)"
+              },
+              min: 0
+            }
+          }
+        }
+      });
     }
   }
 
   // Handle both initial page load and Turbo navigation
-  document.addEventListener("DOMContentLoaded", initChart);
-  document.addEventListener("turbo:load", initChart);
+  document.addEventListener("DOMContentLoaded", initCharts);
+  document.addEventListener("turbo:load", initCharts);
 </script>
 
 <style>
@@ -423,11 +564,141 @@
   .chart-container {
     position: relative;
     height: 400px;
+    margin-bottom: 1.5rem;
     background: rgba(20, 20, 35, 0.8);
     border: 1px solid rgba(0, 212, 255, 0.3);
     border-radius: 8px;
     padding: 1rem;
     backdrop-filter: blur(10px);
+  }
+
+  .deck-composition {
+    padding: 1.5rem;
+    background: rgba(20, 20, 35, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .deck-composition h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .deck-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .player-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .player-name {
+    font-weight: 500;
+    color: #e0e0e0;
+  }
+
+  .deck-total {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  .faction-bars {
+    display: flex;
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .faction-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .faction-bar:hover {
+    filter: brightness(1.2);
+  }
+
+  .faction-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #000;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+
+  .faction-bar.trade-federation {
+    background: #1589FF;
+  }
+
+  .faction-bar.blob {
+    background: #4CC417;
+  }
+
+  .faction-bar.star-empire {
+    background: #FFFF00;
+  }
+
+  .faction-bar.machine-cult {
+    background: #FF0000;
+  }
+
+  .faction-bar.neutral {
+    background: #800080;
+    color: #fff;
+  }
+
+  .faction-bar.neutral .faction-count {
+    color: #fff;
+  }
+
+  .faction-legend {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .legend-item.trade-federation {
+    background: rgba(21, 137, 255, 0.3);
+    color: #1589FF;
+  }
+
+  .legend-item.blob {
+    background: rgba(76, 196, 23, 0.3);
+    color: #4CC417;
+  }
+
+  .legend-item.star-empire {
+    background: rgba(255, 255, 0, 0.3);
+    color: #FFFF00;
+  }
+
+  .legend-item.machine-cult {
+    background: rgba(255, 0, 0, 0.3);
+    color: #FF0000;
+  }
+
+  .legend-item.neutral {
+    background: rgba(128, 0, 128, 0.3);
+    color: #b080b0;
   }
 
   .danger-zone {
@@ -498,6 +769,15 @@
     .chart-container {
       height: 300px;
       padding: 0.5rem;
+    }
+
+    .deck-composition {
+      padding: 1rem;
+    }
+
+    .deck-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
     }
   }
 
