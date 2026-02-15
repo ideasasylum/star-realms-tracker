@@ -208,14 +208,12 @@ module StarRealms
 
     test "game ends with negative authority" do
       # The game ends when Discosaurus drops to -2
-      # Turn 22 doesn't complete (game ends mid-turn)
       assert_equal "ideasasylum", @result.winner
       assert_equal 22, @result.total_turns
 
-      # Turn 21 should be the last completed turn for Discosaurus
-      disco_turns = @result.authority_by_turn["Discosaurus"].map(&:first)
-      assert_includes disco_turns, 21
-      refute_includes disco_turns, 22
+      # Final turn should be included with the killing blow
+      disco_authority = @result.authority_by_turn["Discosaurus"]
+      assert_includes disco_authority, [22, -2]
     end
   end
 
@@ -284,14 +282,13 @@ module StarRealms
     end
 
     test "game ends mid-turn with large attack" do
-      # Turn 10 starts but doesn't complete (game ends when ideasasylum drops to -1)
+      # Turn 10 ends when ideasasylum drops to -1
       assert_equal "Whiskiejac", @result.winner
       assert_equal 10, @result.total_turns
 
-      # Turn 9 should be the last completed turn
-      ideas_turns = @result.authority_by_turn["ideasasylum"].map(&:first)
-      assert_includes ideas_turns, 9
-      refute_includes ideas_turns, 10
+      # Final turn should be included with the killing blow
+      ideas_authority = @result.authority_by_turn["ideasasylum"]
+      assert_includes ideas_authority, [10, -1]
     end
   end
 end

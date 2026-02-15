@@ -89,9 +89,10 @@ module StarRealms
     def parse_line(line)
       stripped = line.strip
 
-      # Check for winner
+      # Check for winner - snapshot final authority state
       if (match = stripped.match(WINNER))
         @winner = match[:player]
+        snapshot_authority(@max_turn)
         return
       end
 
@@ -133,9 +134,9 @@ module StarRealms
       @authority[player] = new_value
     end
 
-    def snapshot_authority
+    def snapshot_authority(turn = @current_turn)
       @players.each do |player|
-        @authority_by_turn[player] << [@current_turn, @authority[player]]
+        @authority_by_turn[player] << [turn, @authority[player]]
       end
     end
   end
