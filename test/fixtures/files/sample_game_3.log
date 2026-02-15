@@ -1,0 +1,311 @@
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+Acquired <color=#800080>Explorer</color>
+	ideasasylum - -2 Trade (Trade:1)
+	Refresh Trade Row Discounts
+ideasasylum ends turn 1
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now Whiskiejac's turn 2
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Acquired <color=#800080>Chancellor Hartman</color>
+	Whiskiejac - -4 Trade (Trade:0)
+	Changed Chancellor Hartman to on-table image
+	Refresh ally indicators
+	Refresh Trade Row Discounts
+Resolving Scrap a card from your hand or discard pile
+Whiskiejac is scrapping: Scout
+	Scrapped <color=#800080>Scout</color>
+Whiskiejac ends turn 2
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now ideasasylum's turn 3
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+	ideasasylum  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Drew 1 cards.
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+Acquired <color=#1589FF>Colony Seed Ship</color>
+	ideasasylum - -5 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Attacked Whiskiejac for 1 (New Authority:49)
+	ideasasylum - -1 Combat (Combat:0)
+	Whiskiejac - -1 Authority (Authority:49)
+ideasasylum ends turn 3
+	Drew 1 cards.
+	Shuffled discard pile to form new deck
+	Drew 4 cards.
+	Refresh ally indicators
+	It is now Whiskiejac's turn 4
+Scrapping Chancellor Hartman
+	Scrapped <color=#800080>Chancellor Hartman</color>
+	Refresh ally indicators
+Whiskiejac is scrapping: Scout
+	Scrapped <color=#800080>Scout</color>
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+Acquired <color=#FF0000>Repair Bot</color>
+	Whiskiejac - -2 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Shuffled discard pile to form new deck
+	Drew 1 cards.
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:2)
+	Drew 1 cards.
+Play all
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+	Revealed Armada
+	Drew 1 cards.
+	Acquired <color=#800080>Explorer</color> to hand.
+Played <color=#800080>Explorer</color>
+	Whiskiejac  >  <color=#800080>Explorer</color> +2 Trade (Trade:5)
+Played <color=#FF0000>Repair Bot</color>
+	Whiskiejac  >  <color=#FF0000>Repair Bot</color> +2 Trade (Trade:7)
+Whiskiejac is not scrapping any cards
+Acquired <color=#1589FF>Loyal Colony</color>
+	Whiskiejac - -7 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Scrapping Explorer
+	Scrapped <color=#800080>Explorer</color>
+	Whiskiejac  >  <color=#800080>Explorer</color> +2 Combat (Combat:4)
+Attacked ideasasylum for 4 (New Authority:46)
+	Whiskiejac - -4 Combat (Combat:0)
+	ideasasylum - -4 Authority (Authority:46)
+Whiskiejac ends turn 4
+	Drew 1 cards.
+	Shuffled discard pile to form new deck
+	Drew 4 cards.
+	Refresh ally indicators
+	It is now ideasasylum's turn 5
+Played <color=#800080>Viper</color>
+	ideasasylum  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Drew 1 cards.
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+Acquired <color=#FF0000>Cargo Mech</color>
+	ideasasylum - -5 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Attacked Whiskiejac for 1 (New Authority:48)
+	ideasasylum - -1 Combat (Combat:0)
+	Whiskiejac - -1 Authority (Authority:48)
+ideasasylum ends turn 5
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now Whiskiejac's turn 6
+Played <color=#1589FF>Loyal Colony</color>
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Combat (Combat:3)
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Trade (Trade:3)
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Authority (Authority:51)
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:4)
+	Drew 1 cards.
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:6)
+Played <color=#FF0000>Repair Bot</color>
+	Whiskiejac  >  <color=#FF0000>Repair Bot</color> +2 Trade (Trade:8)
+Whiskiejac is not scrapping any cards
+Acquired <color=#4CC417>Leviathan</color>
+	Whiskiejac - -8 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Attacked ideasasylum for 4 (New Authority:42)
+	Whiskiejac - -4 Combat (Combat:0)
+	ideasasylum - -4 Authority (Authority:42)
+Whiskiejac ends turn 6
+	Drew 4 cards.
+	Shuffled discard pile to form new deck
+	Drew 1 cards.
+	Refresh ally indicators
+	It is now ideasasylum's turn 7
+Played <color=#800080>Viper</color>
+	ideasasylum  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Drew 1 cards.
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+	ideasasylum  >  <color=#1589FF>Colony Seed Ship</color> +3 Combat (Combat:4)
+	ideasasylum  >  <color=#1589FF>Colony Seed Ship</color> +3 Trade (Trade:4)
+	ideasasylum  >  <color=#1589FF>Colony Seed Ship</color> +3 Authority (Authority:45)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:6)
+	ideasasylum  >  <color=#800080>Explorer</color> +2 Trade (Trade:8)
+Acquired <color=#1589FF>Customs Frigate</color>
+	ideasasylum - -4 Trade (Trade:4)
+	Refresh Trade Row Discounts
+Acquired <color=#1589FF>Patrol Cutter</color>
+	ideasasylum - -3 Trade (Trade:1)
+	Refresh Trade Row Discounts
+Scrapping Explorer
+	Scrapped <color=#800080>Explorer</color>
+	ideasasylum  >  <color=#800080>Explorer</color> +2 Combat (Combat:6)
+	Revealed Diversify
+Resolving Add 4 Trade or Add 5 Combat or Add 6 Authority
+	ideasasylum  >  <color=#800080>Diversify</color> +4 Trade (Trade:5)
+Acquired <color=#FF0000>Mining Mech</color>
+	ideasasylum - -4 Trade (Trade:1)
+	Refresh Trade Row Discounts
+Attacked Loyal Colony
+	ideasasylum - -6 Combat (Combat:0)
+	Destroyed <color=#1589FF>Loyal Colony</color>
+ideasasylum ends turn 7
+	Shuffled discard pile to form new deck
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now Whiskiejac's turn 8
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Drew 1 cards.
+Played <color=#4CC417>Leviathan</color>
+	Whiskiejac  >  <color=#4CC417>Leviathan</color> ability available
+	Whiskiejac  >  <color=#4CC417>Leviathan</color> +9 Combat (Combat:10)
+	Drew 1 cards.
+Played <color=#FF0000>Repair Bot</color>
+	Whiskiejac  >  <color=#FF0000>Repair Bot</color> +2 Trade (Trade:2)
+Whiskiejac is not scrapping any cards
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+Acquired <color=#800080>Hive Lord</color>
+	Whiskiejac - -5 Trade (Trade:0)
+	Changed Hive Lord to on-table image
+	Refresh ally indicators
+	Whiskiejac - +5 Combat (Combat:15)
+	Refresh Trade Row Discounts
+Resolving Scrap up to 5 cards in the Trade Row
+	Scrapped <color=#FFFF00>Gunship</color>
+	Scrapped <color=#800080>Merc Battlecruiser</color>
+Activating Leviathan
+	Acquired <color=#4CC417>Predator</color> to hand.
+	Refresh Trade Row Discounts
+Acquired <color=#4CC417>Predator</color>
+Played <color=#4CC417>Predator</color>
+	Whiskiejac  >  <color=#4CC417>Predator</color> +4 Combat (Combat:19)
+	Drew 1 cards.
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:20)
+	Drew 1 cards.
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:1)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:2)
+Scrapping Hive Lord
+	Scrapped <color=#800080>Hive Lord</color>
+	Refresh ally indicators
+	Drew 1 cards.
+Play all
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+Acquired <color=#4CC417>Cargo Pod</color>
+	Whiskiejac - -3 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Attacked ideasasylum for 20 (New Authority:25)
+	Whiskiejac - -20 Combat (Combat:0)
+	ideasasylum - -20 Authority (Authority:25)
+Whiskiejac ends turn 8
+	Shuffled discard pile to form new deck
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now ideasasylum's turn 9
+Played <color=#800080>Viper</color>
+	ideasasylum  >  <color=#800080>Viper</color> +1 Combat (Combat:1)
+	Drew 1 cards.
+Played <color=#1589FF>Customs Frigate</color>
+	Acquired <color=#FF0000>Probe Bot</color> to the top of the deck.
+	Refresh Trade Row Discounts
+Acquired <color=#FF0000>Probe Bot</color>
+Played <color=#FF0000>Cargo Mech</color>
+	ideasasylum  >  <color=#FF0000>Cargo Mech</color> ability available
+	ideasasylum  >  <color=#FF0000>Cargo Mech</color> +4 Trade (Trade:4)
+ideasasylum is scrapping: Scout
+	Scrapped <color=#800080>Scout</color>
+Acquired <color=#1589FF>Trade Hauler</color>
+	ideasasylum - -2 Trade (Trade:2)
+	Refresh Trade Row Discounts
+Play all
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:3)
+	ideasasylum  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Acquired <color=#800080>Mercenary Garrison</color>
+	ideasasylum - -4 Trade (Trade:0)
+	Refresh Trade Row Discounts
+Attacked Whiskiejac for 1 (New Authority:50)
+	ideasasylum - -1 Combat (Combat:0)
+	Whiskiejac - -1 Authority (Authority:50)
+ideasasylum ends turn 9
+	Drew 5 cards.
+	Refresh ally indicators
+	It is now Whiskiejac's turn 10
+Played <color=#4CC417>Leviathan</color>
+	Whiskiejac  >  <color=#4CC417>Leviathan</color> ability available
+	Whiskiejac  >  <color=#4CC417>Leviathan</color> +9 Combat (Combat:9)
+	Drew 1 cards.
+Played <color=#4CC417>Cargo Pod</color>
+	Whiskiejac  >  <color=#4CC417>Cargo Pod</color> +3 Trade (Trade:3)
+	Whiskiejac  >  <color=#4CC417>Cargo Pod</color> +3 Combat (Combat:12)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:4)
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:5)
+Played <color=#800080>Viper</color>
+	Whiskiejac  >  <color=#800080>Viper</color> +1 Combat (Combat:13)
+	Drew 1 cards.
+Played <color=#800080>Scout</color>
+	Whiskiejac  >  <color=#800080>Scout</color> +1 Trade (Trade:6)
+Acquired <color=#4CC417>Plasma Vent</color>
+	Whiskiejac - -6 Trade (Trade:0)
+	Acquired <color=#4CC417>Plasma Vent</color> to hand.
+	Refresh Trade Row Discounts
+Played <color=#4CC417>Plasma Vent</color>
+	Whiskiejac  >  <color=#4CC417>Plasma Vent</color> +4 Combat (Combat:17)
+	Revealed Exterminate
+	Whiskiejac - +3 Combat (Combat:20)
+Resolving Scrap up to 5 cards in the Trade Row
+	Scrapped <color=#FFFF00>Command Center</color>
+	Scrapped <color=#FFFF00>Lancer</color>
+	Scrapped <color=#1589FF>Customs Frigate</color>
+Activating Leviathan
+	Acquired <color=#FFFF00>Orbital Platform</color> to hand.
+	Refresh Trade Row Discounts
+Acquired <color=#FFFF00>Orbital Platform</color>
+Played <color=#FFFF00>Orbital Platform</color>
+Activating Orbital Platform
+Whiskiejac is selecting Scout
+	Discarded <color=#800080>Scout</color>
+	Drew 1 cards.
+Played <color=#1589FF>Loyal Colony</color>
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Combat (Combat:23)
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Trade (Trade:3)
+	Whiskiejac  >  <color=#1589FF>Loyal Colony</color> +3 Authority (Authority:53)
+Scrapping Cargo Pod
+	Scrapped <color=#4CC417>Cargo Pod</color>
+	Whiskiejac  >  <color=#4CC417>Cargo Pod</color> +3 Combat (Combat:26)
+Attacked ideasasylum for 26 (New Authority:-1)
+	Whiskiejac - -26 Combat (Combat:0)
+	ideasasylum - -26 Authority (Authority:-1)
+	=== Whiskiejac has won the game. ===

@@ -218,4 +218,80 @@ module StarRealms
       refute_includes disco_turns, 22
     end
   end
+
+  class LogParserGame3Test < ActiveSupport::TestCase
+    def setup
+      @log_text = file_fixture("sample_game_3.log").read
+      @result = LogParser.parse(@log_text)
+    end
+
+    test "identifies both players in turn order" do
+      assert_equal ["ideasasylum", "Whiskiejac"], @result.players
+    end
+
+    test "returns the winner" do
+      assert_equal "Whiskiejac", @result.winner
+    end
+
+    test "tracks total turns" do
+      assert_equal 10, @result.total_turns
+    end
+
+    test "both players start at 50 authority" do
+      assert_equal [0, 50], @result.authority_by_turn["ideasasylum"].first
+      assert_equal [0, 50], @result.authority_by_turn["Whiskiejac"].first
+    end
+
+    test "tracks authority for ideasasylum" do
+      ideas_authority = @result.authority_by_turn["ideasasylum"]
+
+      # Turn 1: no attacks, stays at 50
+      assert_includes ideas_authority, [1, 50]
+
+      # Turn 4: attacked for 4, drops to 46
+      assert_includes ideas_authority, [4, 46]
+
+      # Turn 6: attacked for 4, drops to 42
+      assert_includes ideas_authority, [6, 42]
+
+      # Turn 7: gains 3 from Colony Seed Ship, ends at 45
+      assert_includes ideas_authority, [7, 45]
+
+      # Turn 8: attacked for 20, drops to 25
+      assert_includes ideas_authority, [8, 25]
+    end
+
+    test "tracks authority for Whiskiejac with gains" do
+      whiskiejac_authority = @result.authority_by_turn["Whiskiejac"]
+
+      # Turn 2: no attacks, stays at 50
+      assert_includes whiskiejac_authority, [2, 50]
+
+      # Turn 3: attacked for 1, drops to 49
+      assert_includes whiskiejac_authority, [3, 49]
+
+      # Turn 5: attacked for 1, drops to 48
+      assert_includes whiskiejac_authority, [5, 48]
+
+      # Turn 6: gains 3 from Loyal Colony, ends at 51
+      assert_includes whiskiejac_authority, [6, 51]
+
+      # Turn 8: no direct attack on Whiskiejac, stays at 51
+      assert_includes whiskiejac_authority, [8, 51]
+
+      # Turn 9: attacked for 1, drops to 50
+      assert_includes whiskiejac_authority, [9, 50]
+    end
+
+    test "game ends mid-turn with large attack" do
+      # Turn 10 starts but doesn't complete (game ends when ideasasylum drops to -1)
+      assert_equal "Whiskiejac", @result.winner
+      assert_equal 10, @result.total_turns
+
+      # Turn 9 should be the last completed turn
+      ideas_turns = @result.authority_by_turn["ideasasylum"].map(&:first)
+      assert_includes ideas_turns, 9
+      refute_includes ideas_turns, 10
+    end
+  end
 end
