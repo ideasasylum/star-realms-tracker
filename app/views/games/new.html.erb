@@ -69,6 +69,15 @@
 
       const colors = ["#3b82f6", "#ef4444"];
 
+      // Calculate min authority across all players for y-axis
+      let minAuthority = 0;
+      players.forEach(player => {
+        const playerData = chartData[player];
+        playerData.forEach(([turn, authority]) => {
+          if (authority < minAuthority) minAuthority = authority;
+        });
+      });
+
       // Build datasets for each player
       const datasets = players.map((player, index) => {
         const playerData = chartData[player];
@@ -82,7 +91,7 @@
         };
       });
 
-      // Build mission marker datasets (stars on chart)
+      // Build mission marker datasets (yellow stars on chart)
       players.forEach((player, index) => {
         const playerMissions = missions[player] || [];
         if (playerMissions.length > 0) {
@@ -98,11 +107,12 @@
           datasets.push({
             label: `${player} Missions`,
             data: missionPoints,
-            borderColor: colors[index % colors.length],
-            backgroundColor: colors[index % colors.length],
+            borderColor: "#B8860B",
+            backgroundColor: "#FFD700",
             pointStyle: "star",
-            pointRadius: 12,
-            pointHoverRadius: 15,
+            pointRadius: 14,
+            pointHoverRadius: 18,
+            borderWidth: 2,
             showLine: false,
             type: "scatter"
           });
@@ -149,7 +159,8 @@
               title: {
                 display: true,
                 text: "Authority"
-              }
+              },
+              min: minAuthority
             }
           }
         }
