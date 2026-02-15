@@ -30,7 +30,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_select ".summary", /Heofty vs ideasasylum/
-    assert_select ".summary", /Winner:.*ideasasylum/
+    assert_select ".summary .winner", /ideasasylum/
     assert_select "canvas#authorityChart"
   end
 

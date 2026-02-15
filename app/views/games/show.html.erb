@@ -1,34 +1,53 @@
+<div class="starfield"></div>
 <div class="container">
   <div class="header">
     <h1>Game Details</h1>
     <div class="header-actions">
       <%= link_to "All Games", games_path, class: "btn btn-secondary" %>
-      <%= link_to "Analyse New Game", new_game_path, class: "btn" %>
+      <%= link_to "Analyse New Game", new_game_path, class: "btn btn-primary" %>
     </div>
   </div>
 
   <div class="results">
     <div class="summary">
-      <p><strong>Players:</strong> <%= @result.players.join(" vs ") %></p>
-      <p><strong>Total Turns:</strong> <%= @result.total_turns %></p>
-      <% if @result.winner %>
-        <p><strong>Winner:</strong> <%= @result.winner %></p>
-      <% else %>
-        <p><em>Game incomplete</em></p>
-      <% end %>
+      <div class="stat-row">
+        <span class="label">Players</span>
+        <span class="value"><%= @result.players.join(" vs ") %></span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Total Turns</span>
+        <span class="value"><%= @result.total_turns %></span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Winner</span>
+        <% if @result.winner %>
+          <span class="value winner"><%= @result.winner %></span>
+        <% else %>
+          <span class="value incomplete">Incomplete</span>
+        <% end %>
+      </div>
       <% if @result.mission_game? %>
-        <p><strong>Game Mode:</strong> Missions</p>
+        <div class="stat-row">
+          <span class="label">Game Mode</span>
+          <span class="value mission-mode">Missions</span>
+        </div>
         <% @result.players.each do |player| %>
           <% missions = @result.missions_by_turn[player] %>
           <% if missions.any? %>
-            <p><strong><%= player %> Missions:</strong>
-              <%= missions.map { |turn, name| "#{name} (Turn #{turn})" }.join(", ") %>
-              (<%= missions.size %>/3)
-            </p>
+            <div class="stat-row">
+              <span class="label"><%= player %> Missions</span>
+              <span class="value">
+                <%= missions.map { |turn, name| "#{name} (Turn #{turn})" }.join(", ") %>
+                <span class="mission-count">(<%= missions.size %>/3)</span>
+              </span>
+            </div>
           <% end %>
         <% end %>
       <% end %>
-      <p class="meta"><strong>Recorded:</strong> <%= @game.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+      <div class="stat-row meta">
+        <span class="label">Recorded</span>
+        <span class="value"><%= @game.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+      </div>
     </div>
 
     <div class="chart-container">
@@ -57,14 +76,15 @@
       const players = JSON.parse(dataEl.dataset.players);
       const missions = JSON.parse(dataEl.dataset.missions);
 
-      const colors = ["#3b82f6", "#ef4444"];
+      // Neon colors for space theme
+      const colors = ["#00d4ff", "#ff4444"];
 
       // Create a yellow star image for mission markers
       const starSize = 28;
       const starImage = new Image(starSize, starSize);
       const starSvg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${starSize}" height="${starSize}" viewBox="0 0 24 24">
-          <path fill="#FFD700" stroke="#B8860B" stroke-width="1"
+          <path fill="#FFD700" stroke="#FFA500" stroke-width="1"
             d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
         </svg>`;
       starImage.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(starSvg);
@@ -87,7 +107,12 @@
           borderColor: colors[index % colors.length],
           backgroundColor: colors[index % colors.length] + "20",
           fill: false,
-          tension: 0.1
+          tension: 0.1,
+          borderWidth: 2,
+          pointBackgroundColor: colors[index % colors.length],
+          pointBorderColor: colors[index % colors.length],
+          pointRadius: 4,
+          pointHoverRadius: 6
         };
       });
 
@@ -123,21 +148,29 @@
         data: { datasets },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
-              text: "Authority Over Time"
+              text: "Authority Over Time",
+              color: "#e0e0e0",
+              font: { size: 16, weight: "normal" }
             },
             legend: {
               position: "top",
               labels: {
+                color: "#e0e0e0",
                 filter: function(item, chart) {
-                  // Hide mission datasets from legend
                   return !item.text.includes("Missions");
                 }
               }
             },
             tooltip: {
+              backgroundColor: "rgba(20, 20, 35, 0.9)",
+              titleColor: "#fff",
+              bodyColor: "#e0e0e0",
+              borderColor: "rgba(0, 212, 255, 0.5)",
+              borderWidth: 1,
               callbacks: {
                 label: function(context) {
                   if (context.raw.mission) {
@@ -153,16 +186,28 @@
               type: "linear",
               title: {
                 display: true,
-                text: "Turn"
+                text: "Turn",
+                color: "#888"
               },
               ticks: {
-                stepSize: 1
+                stepSize: 1,
+                color: "#888"
+              },
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)"
               }
             },
             y: {
               title: {
                 display: true,
-                text: "Authority"
+                text: "Authority",
+                color: "#888"
+              },
+              ticks: {
+                color: "#888"
+              },
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)"
               },
               min: minAuthority
             }
@@ -178,52 +223,128 @@
 </script>
 
 <style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #0a0a0f;
+    min-height: 100vh;
+  }
+
+  .starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse at bottom, #1a1a2e 0%, #0a0a0f 100%);
+    z-index: -1;
+  }
+
+  .starfield::before,
+  .starfield::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+      radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1px 1px at 230px 80px, #fff, transparent),
+      radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 370px 50px, #fff, transparent),
+      radial-gradient(2px 2px at 450px 180px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 520px 90px, #fff, transparent),
+      radial-gradient(2px 2px at 600px 200px, rgba(255,255,255,0.9), transparent);
+    background-size: 650px 250px;
+    animation: twinkle 8s ease-in-out infinite;
+  }
+
+  .starfield::after {
+    background-size: 750px 300px;
+    animation-delay: -4s;
+    opacity: 0.7;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
   .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 2rem;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #e0e0e0;
+    position: relative;
+    z-index: 1;
   }
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .header-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   h1 {
     margin: 0;
-    color: #1f2937;
+    color: #fff;
+    font-weight: 300;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 20px rgba(0, 200, 255, 0.5), 0 0 40px rgba(0, 200, 255, 0.2);
   }
 
   .btn {
     padding: 0.75rem 1.5rem;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.375rem;
-    font-size: 1rem;
+    background: transparent;
+    color: #fff;
+    border: 2px solid;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
   }
 
-  .btn:hover {
-    background-color: #2563eb;
+  .btn-primary {
+    border-color: #00d4ff;
+    color: #00d4ff;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3), inset 0 0 10px rgba(0, 212, 255, 0.1);
+  }
+
+  .btn-primary:hover {
+    background: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.2);
   }
 
   .btn-secondary {
-    background-color: #6b7280;
+    border-color: #888;
+    color: #aaa;
   }
 
   .btn-secondary:hover {
-    background-color: #4b5563;
+    border-color: #aaa;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .results {
@@ -232,23 +353,72 @@
 
   .summary {
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.375rem;
+    padding: 1.5rem;
+    background: rgba(20, 20, 35, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
 
-  .summary p {
-    margin: 0.25rem 0;
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .summary .meta {
-    margin-top: 0.75rem;
-    color: #6b7280;
+  .stat-row:last-child {
+    border-bottom: none;
+  }
+
+  .stat-row .label {
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-row .value {
+    color: #e0e0e0;
+    font-weight: 500;
+  }
+
+  .stat-row .value.winner {
+    color: #4ade80;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+  }
+
+  .stat-row .value.incomplete {
+    color: #888;
+    font-style: italic;
+  }
+
+  .stat-row .value.mission-mode {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  .stat-row .mission-count {
+    color: #ffd700;
+  }
+
+  .stat-row.meta {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+  }
+
+  .stat-row.meta .value {
+    color: #666;
     font-size: 0.875rem;
   }
 
   .chart-container {
     position: relative;
     height: 400px;
+    background: rgba(20, 20, 35, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
   }
 </style>
