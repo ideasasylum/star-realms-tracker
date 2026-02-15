@@ -101,7 +101,8 @@
         };
       });
 
-      // Build mission marker datasets (yellow stars on chart)
+      // Build mission marker datasets (yellow stars above the line)
+      const starOffset = 6; // Position stars above the authority line
       players.forEach((player, index) => {
         const playerMissions = missions[player] || [];
         if (playerMissions.length > 0) {
@@ -111,7 +112,7 @@
             // Find the authority at this turn (or closest prior)
             const authorityAtTurn = playerData.find(([t, a]) => t === turn);
             const authority = authorityAtTurn ? authorityAtTurn[1] : 50;
-            return { x: turn, y: authority, mission: missionName };
+            return { x: turn, y: authority + starOffset, mission: missionName };
           });
 
           datasets.push({
@@ -138,7 +139,13 @@
               text: "Authority Over Time"
             },
             legend: {
-              position: "top"
+              position: "top",
+              labels: {
+                filter: function(item, chart) {
+                  // Hide mission datasets from legend
+                  return !item.text.includes("Missions");
+                }
+              }
             },
             tooltip: {
               callbacks: {
