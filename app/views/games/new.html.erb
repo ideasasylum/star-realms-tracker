@@ -1,6 +1,6 @@
 <div class="container">
   <div class="header">
-    <h1>Parse New Game</h1>
+    <h1>Analyse New Game</h1>
     <%= link_to "All Games", games_path, class: "btn btn-secondary" %>
   </div>
 
@@ -10,13 +10,13 @@
       <%= text_area_tag :log_text, params[:log_text], rows: 15, class: "form-control", placeholder: "Paste Star Realms game log here..." %>
     </div>
     <div class="form-actions">
-      <%= submit_tag "Parse & Save Game", class: "btn" %>
+      <%= submit_tag "Analyse & Save Game", class: "btn" %>
     </div>
   <% end %>
 
   <% if @result && @result.players.empty? %>
     <div class="error">
-      <p>Could not parse game log. Make sure you paste the complete game output.</p>
+      <p>Could not analyse game log. Make sure you paste the complete game output.</p>
     </div>
   <% end %>
 

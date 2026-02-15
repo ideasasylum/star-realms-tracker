@@ -1,7 +1,7 @@
 <div class="container">
   <div class="header">
     <h1>Star Realms Tracker</h1>
-    <%= link_to "Parse New Game", new_game_path, class: "btn" %>
+    <%= link_to "Analyse New Game", new_game_path, class: "btn" %>
   </div>
 
   <% if @games.any? %>
@@ -38,7 +38,7 @@
   <% else %>
     <div class="empty-state">
       <p>No games recorded yet.</p>
-      <p><%= link_to "Parse your first game", new_game_path %></p>
+      <p><%= link_to "Analyse your first game", new_game_path %></p>
     </div>
   <% end %>
 </div>

@@ -12,7 +12,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
     get new_game_path
     assert_response :success
-    assert_select "h1", "Parse New Game"
+    assert_select "h1", "Analyse New Game"
     assert_select "textarea[name=log_text]"
   end
 
@@ -61,7 +61,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_select ".error", /Could not parse game log/
+    assert_select ".error", /Could not analyse game log/
   end
 
   test "index shows list of games" do
