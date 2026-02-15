@@ -6,6 +6,7 @@
   </div>
 
   <% if @games.any? %>
+    <div class="table-wrapper">
     <table class="games-table">
       <thead>
         <tr>
@@ -36,6 +37,7 @@
         <% end %>
       </tbody>
     </table>
+    </div>
   <% else %>
     <div class="empty-state">
       <p>No games recorded yet.</p>
@@ -235,5 +237,69 @@
 
   .empty-state a:hover {
     text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+  }
+
+  /* Mobile-first responsive table wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+  }
+
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .btn {
+      width: 100%;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .games-table {
+      font-size: 0.85rem;
+    }
+
+    .games-table th,
+    .games-table td {
+      padding: 0.75rem 0.5rem;
+      white-space: nowrap;
+    }
+
+    .games-table th:nth-child(4),
+    .games-table td:nth-child(4),
+    .games-table th:nth-child(6),
+    .games-table td:nth-child(6) {
+      display: none;
+    }
+
+    .empty-state {
+      padding: 2rem 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.25rem;
+      letter-spacing: 0.05em;
+    }
+
+    .games-table th:nth-child(5),
+    .games-table td:nth-child(5) {
+      display: none;
+    }
   }
 </style>
