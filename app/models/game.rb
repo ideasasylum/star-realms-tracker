@@ -22,15 +22,15 @@ class Game < ApplicationRecord
   end
 
   def final_score
-    "#{player_1_final_authority} - #{player_2_final_authority}"
+    "#{player_1_final_authority} : #{player_2_final_authority}"
   end
 
   # Returns score with winner's score first
   def final_score_by_result
     if winner_name == player_2_name
-      "#{player_2_final_authority} - #{player_1_final_authority}"
+      "#{player_2_final_authority} : #{player_1_final_authority}"
     else
-      "#{player_1_final_authority} - #{player_2_final_authority}"
+      "#{player_1_final_authority} : #{player_2_final_authority}"
     end
   end
 
