@@ -17,8 +17,12 @@ module StarRealms
     # Regex patterns for parsing
     TURN_START = /It is now (?<player>.+)'s turn (?<turn>\d+)/
     TURN_END = /^(?<player>.+) ends turn (?<turn>\d+)$/
-    AUTHORITY_LOSS = /(?<player>\S+) - -(?<amount>\d+) Authority \(Authority:(?<new_value>\d+)\)/
+    # Direct authority loss: "player - -N Authority (Authority:M)"
+    AUTHORITY_LOSS = /(?<player>\S+) - -(?<amount>\d+) Authority \(Authority:(?<new_value>-?\d+)\)/
+    # Direct authority gain: "player - +N Authority (Authority:M)"
     AUTHORITY_GAIN = /(?<player>\S+) - \+(?<amount>\d+) Authority \(Authority:(?<new_value>\d+)\)/
+    # Card-based authority gain: "player  >  <card> +N Authority (Authority:M)"
+    CARD_AUTHORITY = /(?<player>\S+)\s+>\s+.+Authority \(Authority:(?<new_value>\d+)\)/
     WINNER = /=== (?<player>.+) has won the game/
 
     def self.parse(log_text)
@@ -98,6 +102,12 @@ module StarRealms
       end
 
       if (match = stripped.match(AUTHORITY_GAIN))
+        update_authority(match[:player], match[:new_value].to_i)
+        return
+      end
+
+      # Check for card-based authority changes (e.g., "player > <card> +N Authority")
+      if (match = stripped.match(CARD_AUTHORITY))
         update_authority(match[:player], match[:new_value].to_i)
         return
       end

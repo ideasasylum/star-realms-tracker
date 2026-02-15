@@ -121,4 +121,101 @@ module StarRealms
       assert_equal 0, result.total_turns
     end
   end
+
+  class LogParserGame2Test < ActiveSupport::TestCase
+    def setup
+      @log_text = file_fixture("sample_game_2.log").read
+      @result = LogParser.parse(@log_text)
+    end
+
+    test "identifies both players in turn order" do
+      assert_equal ["Discosaurus", "ideasasylum"], @result.players
+    end
+
+    test "returns the winner" do
+      assert_equal "ideasasylum", @result.winner
+    end
+
+    test "tracks total turns" do
+      assert_equal 22, @result.total_turns
+    end
+
+    test "both players start at 50 authority" do
+      assert_equal [0, 50], @result.authority_by_turn["Discosaurus"].first
+      assert_equal [0, 50], @result.authority_by_turn["ideasasylum"].first
+    end
+
+    test "tracks authority changes for Discosaurus" do
+      disco_authority = @result.authority_by_turn["Discosaurus"]
+
+      # Turn 1: no damage taken, stays at 50
+      assert_includes disco_authority, [1, 50]
+
+      # Turn 2: attacked for 1, drops to 49
+      assert_includes disco_authority, [2, 49]
+
+      # Turn 6: attacked for 11, drops to 37
+      assert_includes disco_authority, [6, 37]
+
+      # Turn 10: attacked for 14, drops to 31
+      assert_includes disco_authority, [10, 31]
+
+      # Turn 12: attacked for 6, drops to 25
+      assert_includes disco_authority, [12, 25]
+
+      # Turn 18: attacked twice (5 + 2), drops to 6
+      assert_includes disco_authority, [18, 6]
+
+      # Turn 20: attacked for 4, drops to 5
+      assert_includes disco_authority, [20, 5]
+
+      # Turn 21: gains 4 from Frontier Ferry, attacked for 6, ends at 9
+      assert_includes disco_authority, [21, 9]
+    end
+
+    test "tracks authority changes for ideasasylum with gains" do
+      ideas_authority = @result.authority_by_turn["ideasasylum"]
+
+      # Turn 8: gains 5 from Federal Transport, attacked for 1, ends at 45
+      assert_includes ideas_authority, [8, 45]
+
+      # Turn 10: gains 3 from Mercenary Garrison, ends at 40
+      assert_includes ideas_authority, [10, 40]
+
+      # Turn 12: gains 5+3 from Federal Transport + Mercenary Garrison, ends at 48
+      assert_includes ideas_authority, [12, 48]
+
+      # Turn 14: gains 3 from Mercenary Garrison, ends at 51 (above starting!)
+      assert_includes ideas_authority, [14, 51]
+
+      # Turn 16: gains 5 from Federal Transport, ends at 56
+      assert_includes ideas_authority, [16, 56]
+    end
+
+    test "tracks authority swings in long game" do
+      disco_authority = @result.authority_by_turn["Discosaurus"]
+      ideas_authority = @result.authority_by_turn["ideasasylum"]
+
+      # Discosaurus recovers authority in turn 9 (gains 3 + 6 = 9)
+      assert_includes disco_authority, [9, 45]
+
+      # Discosaurus recovers again in turn 13 (gains 4 from Frontier Ferry)
+      assert_includes disco_authority, [13, 29]
+
+      # Discosaurus recovers in turn 19 (gains 3 from Construction Hauler)
+      assert_includes disco_authority, [19, 9]
+    end
+
+    test "game ends with negative authority" do
+      # The game ends when Discosaurus drops to -2
+      # Turn 22 doesn't complete (game ends mid-turn)
+      assert_equal "ideasasylum", @result.winner
+      assert_equal 22, @result.total_turns
+
+      # Turn 21 should be the last completed turn for Discosaurus
+      disco_turns = @result.authority_by_turn["Discosaurus"].map(&:first)
+      assert_includes disco_turns, 21
+      refute_includes disco_turns, 22
+    end
+  end
 end
