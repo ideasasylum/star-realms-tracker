@@ -1,0 +1,203 @@
+<div class="container">
+  <h1>Star Realms Log Parser</h1>
+
+  <%= form_with url: games_path, method: :post, local: true do |f| %>
+    <div class="form-group">
+      <label for="log_text">Paste your game log:</label>
+      <%= text_area_tag :log_text, params[:log_text], rows: 10, class: "form-control", placeholder: "Paste Star Realms game log here..." %>
+    </div>
+    <div class="form-actions">
+      <%= submit_tag "Parse Game", class: "btn" %>
+    </div>
+  <% end %>
+
+  <% if @result && @result.players.any? %>
+    <div class="results">
+      <h2>Game Results</h2>
+
+      <div class="summary">
+        <p><strong>Players:</strong> <%= @result.players.join(" vs ") %></p>
+        <p><strong>Total Turns:</strong> <%= @result.total_turns %></p>
+        <% if @result.winner %>
+          <p><strong>Winner:</strong> <%= @result.winner %></p>
+        <% else %>
+          <p><em>Game incomplete</em></p>
+        <% end %>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="authorityChart"></canvas>
+      </div>
+
+      <%= content_tag :script, nil,
+            type: "module",
+            data: {
+              chart_data: @result.authority_by_turn.to_json,
+              players: @result.players.to_json
+            },
+            id: "chart-data" %>
+    </div>
+  <% elsif @result %>
+    <div class="error">
+      <p>Could not parse game log. Make sure you paste the complete game output.</p>
+    </div>
+  <% end %>
+</div>
+
+<script type="module">
+  import Chart from "chart.js";
+
+  const dataEl = document.getElementById("chart-data");
+  if (dataEl) {
+    const chartData = JSON.parse(dataEl.dataset.chartData);
+    const players = JSON.parse(dataEl.dataset.players);
+
+    const colors = ["#3b82f6", "#ef4444"];
+
+    // Build datasets for each player
+    const datasets = players.map((player, index) => {
+      const playerData = chartData[player];
+      return {
+        label: player,
+        data: playerData.map(([turn, authority]) => ({ x: turn, y: authority })),
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + "20",
+        fill: false,
+        tension: 0.1
+      };
+    });
+
+    // Find all unique turns across both players
+    const allTurns = [...new Set(
+      Object.values(chartData).flatMap(data => data.map(([turn]) => turn))
+    )].sort((a, b) => a - b);
+
+    const ctx = document.getElementById("authorityChart").getContext("2d");
+    new Chart(ctx, {
+      type: "line",
+      data: { datasets },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Authority Over Time"
+          },
+          legend: {
+            position: "top"
+          }
+        },
+        scales: {
+          x: {
+            type: "linear",
+            title: {
+              display: true,
+              text: "Turn"
+            },
+            ticks: {
+              stepSize: 1
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: "Authority"
+            },
+            min: 0
+          }
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  h1 {
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    resize: vertical;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-actions {
+    margin-top: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  .btn:hover {
+    background-color: #2563eb;
+  }
+
+  .results {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.375rem;
+  }
+
+  .summary p {
+    margin: 0.25rem 0;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 400px;
+  }
+
+  .error {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.375rem;
+    color: #991b1b;
+  }
+</style>
