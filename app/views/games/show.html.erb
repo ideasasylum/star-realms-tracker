@@ -12,11 +12,11 @@
     <div class="summary">
       <div class="stat-row">
         <span class="label">Players</span>
-        <span class="value"><%= @result.players.join(" vs ") %></span>
+        <span class="value"><%= @game.players_by_result.join(" vs ") %></span>
       </div>
       <div class="stat-row">
-        <span class="label">Total Turns</span>
-        <span class="value"><%= @result.total_turns %></span>
+        <span class="label">Final Score</span>
+        <span class="value"><%= @game.final_score_by_result %></span>
       </div>
       <div class="stat-row">
         <span class="label">Winner</span>
@@ -25,6 +25,10 @@
         <% else %>
           <span class="value incomplete">Incomplete</span>
         <% end %>
+      </div>
+      <div class="stat-row">
+        <span class="label">Total Turns</span>
+        <span class="value"><%= @result.total_turns %></span>
       </div>
       <% if @result.mission_game? %>
         <div class="stat-row">
@@ -62,6 +66,10 @@
             missions: @result.missions_by_turn.to_json
           },
           id: "chart-data" %>
+
+    <div class="danger-zone">
+      <%= button_to "Delete Game", game_path(@game), method: :delete, class: "btn btn-danger", data: { turbo_confirm: "Are you sure you want to delete this game?" } %>
+    </div>
   </div>
 </div>
 
@@ -420,6 +428,25 @@
     border-radius: 8px;
     padding: 1rem;
     backdrop-filter: blur(10px);
+  }
+
+  .danger-zone {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 68, 68, 0.3);
+    text-align: right;
+  }
+
+  .btn-danger {
+    border-color: #ff4444;
+    color: #ff4444;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .btn-danger:hover {
+    background: rgba(255, 68, 68, 0.2);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
   }
 
   /* Mobile styles */

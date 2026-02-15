@@ -12,8 +12,26 @@ class Game < ApplicationRecord
     [player_1_name, player_2_name]
   end
 
+  # Returns players with winner first
+  def players_by_result
+    if winner_name == player_2_name
+      [player_2_name, player_1_name]
+    else
+      [player_1_name, player_2_name]
+    end
+  end
+
   def final_score
     "#{player_1_final_authority} - #{player_2_final_authority}"
+  end
+
+  # Returns score with winner's score first
+  def final_score_by_result
+    if winner_name == player_2_name
+      "#{player_2_final_authority} - #{player_1_final_authority}"
+    else
+      "#{player_1_final_authority} - #{player_2_final_authority}"
+    end
   end
 
   def complete?

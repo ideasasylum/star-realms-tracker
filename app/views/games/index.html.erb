@@ -22,7 +22,7 @@
         <% @games.each do |game| %>
           <tr>
             <td><%= link_to game.created_at.strftime("%b %d, %Y"), game %></td>
-            <td><%= game.player_1_name %> vs <%= game.player_2_name %></td>
+            <td><%= game.players_by_result.join(" vs ") %></td>
             <td>
               <% if game.complete? %>
                 <span class="winner"><%= game.winner_name %></span>
@@ -30,7 +30,7 @@
                 <span class="incomplete">Incomplete</span>
               <% end %>
             </td>
-            <td><%= game.final_score %></td>
+            <td><%= game.final_score_by_result %></td>
             <td><%= game.total_turns %></td>
             <td><%= game.is_mission_game? ? "Missions" : "Standard" %></td>
           </tr>

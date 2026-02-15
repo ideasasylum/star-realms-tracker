@@ -29,7 +29,8 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     # Follow redirect and check show page
     follow_redirect!
     assert_response :success
-    assert_select ".summary", /Heofty vs ideasasylum/
+    # Winner is listed first
+    assert_select ".summary", /ideasasylum vs Heofty/
     assert_select ".summary .winner", /ideasasylum/
     assert_select "canvas#authorityChart"
   end
@@ -42,7 +43,8 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Game Details"
-    assert_select ".summary", /Heofty vs ideasasylum/
+    # Winner is listed first
+    assert_select ".summary", /ideasasylum vs Heofty/
     assert_select "canvas#authorityChart"
   end
 
@@ -74,5 +76,16 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".games-table tbody tr", minimum: 1
     assert_select ".games-table", /Heofty/
     assert_select ".games-table", /ideasasylum/
+  end
+
+  test "should destroy game" do
+    log_text = file_fixture("sample_game.log").read
+    game = Game.create_from_log(log_text)
+
+    assert_difference("Game.count", -1) do
+      delete game_path(game)
+    end
+
+    assert_redirected_to games_path
   end
 end
