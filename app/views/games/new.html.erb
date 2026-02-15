@@ -23,6 +23,18 @@
         <% else %>
           <p><em>Game incomplete</em></p>
         <% end %>
+        <% if @result.mission_game? %>
+          <p><strong>Game Mode:</strong> Missions</p>
+          <% @result.players.each do |player| %>
+            <% missions = @result.missions_by_turn[player] %>
+            <% if missions.any? %>
+              <p><strong><%= player %> Missions:</strong>
+                <%= missions.map { |turn, name| "#{name} (Turn #{turn})" }.join(", ") %>
+                (<%= missions.size %>/3)
+              </p>
+            <% end %>
+          <% end %>
+        <% end %>
       </div>
 
       <div class="chart-container">
@@ -33,7 +45,8 @@
             type: "module",
             data: {
               chart_data: @result.authority_by_turn.to_json,
-              players: @result.players.to_json
+              players: @result.players.to_json,
+              missions: @result.missions_by_turn.to_json
             },
             id: "chart-data" %>
     </div>
@@ -45,12 +58,14 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const dataEl = document.getElementById("chart-data");
     if (dataEl) {
       const chartData = JSON.parse(dataEl.dataset.chartData);
       const players = JSON.parse(dataEl.dataset.players);
+      const missions = JSON.parse(dataEl.dataset.missions);
 
       const colors = ["#3b82f6", "#ef4444"];
 
@@ -67,6 +82,33 @@
         };
       });
 
+      // Build mission marker datasets (stars on chart)
+      players.forEach((player, index) => {
+        const playerMissions = missions[player] || [];
+        if (playerMissions.length > 0) {
+          // Find authority at each mission turn
+          const playerData = chartData[player];
+          const missionPoints = playerMissions.map(([turn, missionName]) => {
+            // Find the authority at this turn (or closest prior)
+            const authorityAtTurn = playerData.find(([t, a]) => t === turn);
+            const authority = authorityAtTurn ? authorityAtTurn[1] : 50;
+            return { x: turn, y: authority, mission: missionName };
+          });
+
+          datasets.push({
+            label: `${player} Missions`,
+            data: missionPoints,
+            borderColor: colors[index % colors.length],
+            backgroundColor: colors[index % colors.length],
+            pointStyle: "star",
+            pointRadius: 12,
+            pointHoverRadius: 15,
+            showLine: false,
+            type: "scatter"
+          });
+        }
+      });
+
       const ctx = document.getElementById("authorityChart").getContext("2d");
       new Chart(ctx, {
         type: "line",
@@ -80,6 +122,16 @@
             },
             legend: {
               position: "top"
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (context.raw.mission) {
+                    return `${context.dataset.label.replace(" Missions", "")}: ${context.raw.mission} completed`;
+                  }
+                  return `${context.dataset.label}: ${context.raw.y} Authority`;
+                }
+              }
             }
           },
           scales: {
@@ -97,8 +149,7 @@
               title: {
                 display: true,
                 text: "Authority"
-              },
-              min: 0
+              }
             }
           }
         }

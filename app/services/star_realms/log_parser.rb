@@ -10,6 +10,7 @@ module StarRealms
   #   result.authority_by_turn # => {"Heofty" => [[0, 50], [1, 50], ...], ...}
   #   result.winner            # => "ideasasylum"
   #   result.total_turns       # => 16
+  #   result.missions_by_turn  # => {"Heofty" => [], "ideasasylum" => [[5, "Ally"]]}
   #
   class LogParser
     STARTING_AUTHORITY = 50
@@ -24,6 +25,9 @@ module StarRealms
     # Card-based authority gain: "player  >  <card> +N Authority (Authority:M)"
     CARD_AUTHORITY = /(?<player>\S+)\s+>\s+.+Authority \(Authority:(?<new_value>\d+)\)/
     WINNER = /=== (?<player>.+) has won the game/
+    # Mission completion: "Revealed {MissionName}"
+    # Known missions: Exterminate, Ally, Convert, Influence, Dominate, Rule, Unite, Colonize, Defend, Diversify, Armada
+    MISSION_REVEALED = /Revealed (?<mission>Exterminate|Ally|Convert|Influence|Dominate|Rule|Unite|Colonize|Defend|Diversify|Armada)/
 
     def self.parse(log_text)
       new(log_text).parse
@@ -35,9 +39,11 @@ module StarRealms
       @players = []
       @authority = {}
       @authority_by_turn = {}
+      @missions_by_turn = {}
       @winner = nil
       @current_turn = 0
       @max_turn = 0
+      @current_player = nil
     end
 
     def parse
@@ -49,7 +55,8 @@ module StarRealms
         players: @players,
         authority_by_turn: @authority_by_turn,
         winner: @winner,
-        total_turns: @max_turn
+        total_turns: @max_turn,
+        missions_by_turn: @missions_by_turn
       )
     end
 
@@ -77,7 +84,11 @@ module StarRealms
       @players.each do |player|
         @authority[player] = STARTING_AUTHORITY
         @authority_by_turn[player] = [[0, STARTING_AUTHORITY]]
+        @missions_by_turn[player] = []
       end
+      # First player starts turn 1
+      @current_player = @players.first
+      @current_turn = 1
     end
 
     def parse_events
@@ -93,6 +104,12 @@ module StarRealms
       if (match = stripped.match(WINNER))
         @winner = match[:player]
         snapshot_authority(@max_turn)
+        return
+      end
+
+      # Check for mission completion (in mission game mode)
+      if (match = stripped.match(MISSION_REVEALED))
+        record_mission(match[:mission])
         return
       end
 
@@ -113,16 +130,19 @@ module StarRealms
         return
       end
 
-      # Track turn starts to capture games that end mid-turn
+      # Track turn starts to capture games that end mid-turn and current player
       if (match = stripped.match(TURN_START))
         turn = match[:turn].to_i
         @max_turn = turn if turn > @max_turn
+        @current_turn = turn
+        @current_player = match[:player]
         return
       end
 
       # Check for turn end (snapshot authority at end of turn)
       if (match = line.match(TURN_END))
         @current_turn = match[:turn].to_i
+        @current_player = match[:player]
         @max_turn = @current_turn if @current_turn > @max_turn
         snapshot_authority
       end
@@ -132,6 +152,12 @@ module StarRealms
       return unless @authority.key?(player)
 
       @authority[player] = new_value
+    end
+
+    def record_mission(mission_name)
+      return unless @current_player && @missions_by_turn.key?(@current_player)
+
+      @missions_by_turn[@current_player] << [@current_turn, mission_name]
     end
 
     def snapshot_authority(turn = @current_turn)
