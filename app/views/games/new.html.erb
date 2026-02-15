@@ -1,7 +1,7 @@
 <div class="container">
   <h1>Star Realms Log Parser</h1>
 
-  <%= form_with url: games_path, method: :post, local: true do |f| %>
+  <%= form_with url: games_path, method: :post, data: { turbo: false } do |f| %>
     <div class="form-group">
       <label for="log_text">Paste your game log:</label>
       <%= text_area_tag :log_text, params[:log_text], rows: 10, class: "form-control", placeholder: "Paste Star Realms game log here..." %>
@@ -44,71 +44,67 @@
   <% end %>
 </div>
 
-<script type="module">
-  import Chart from "chart.js";
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const dataEl = document.getElementById("chart-data");
+    if (dataEl) {
+      const chartData = JSON.parse(dataEl.dataset.chartData);
+      const players = JSON.parse(dataEl.dataset.players);
 
-  const dataEl = document.getElementById("chart-data");
-  if (dataEl) {
-    const chartData = JSON.parse(dataEl.dataset.chartData);
-    const players = JSON.parse(dataEl.dataset.players);
+      const colors = ["#3b82f6", "#ef4444"];
 
-    const colors = ["#3b82f6", "#ef4444"];
+      // Build datasets for each player
+      const datasets = players.map((player, index) => {
+        const playerData = chartData[player];
+        return {
+          label: player,
+          data: playerData.map(([turn, authority]) => ({ x: turn, y: authority })),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          fill: false,
+          tension: 0.1
+        };
+      });
 
-    // Build datasets for each player
-    const datasets = players.map((player, index) => {
-      const playerData = chartData[player];
-      return {
-        label: player,
-        data: playerData.map(([turn, authority]) => ({ x: turn, y: authority })),
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + "20",
-        fill: false,
-        tension: 0.1
-      };
-    });
-
-    // Find all unique turns across both players
-    const allTurns = [...new Set(
-      Object.values(chartData).flatMap(data => data.map(([turn]) => turn))
-    )].sort((a, b) => a - b);
-
-    const ctx = document.getElementById("authorityChart").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: { datasets },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: "Authority Over Time"
-          },
-          legend: {
-            position: "top"
-          }
-        },
-        scales: {
-          x: {
-            type: "linear",
+      const ctx = document.getElementById("authorityChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: { datasets },
+        options: {
+          responsive: true,
+          plugins: {
             title: {
               display: true,
-              text: "Turn"
+              text: "Authority Over Time"
             },
-            ticks: {
-              stepSize: 1
+            legend: {
+              position: "top"
             }
           },
-          y: {
-            title: {
-              display: true,
-              text: "Authority"
+          scales: {
+            x: {
+              type: "linear",
+              title: {
+                display: true,
+                text: "Turn"
+              },
+              ticks: {
+                stepSize: 1
+              }
             },
-            min: 0
+            y: {
+              title: {
+                display: true,
+                text: "Authority"
+              },
+              min: 0
+            }
           }
         }
-      }
-    });
-  }
+      });
+    }
+  });
 </script>
 
 <style>
