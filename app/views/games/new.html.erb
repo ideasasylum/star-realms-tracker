@@ -1,187 +1,31 @@
 <div class="container">
-  <h1>Star Realms Log Parser</h1>
+  <div class="header">
+    <h1>Parse New Game</h1>
+    <%= link_to "All Games", games_path, class: "btn btn-secondary" %>
+  </div>
 
   <%= form_with url: games_path, method: :post, data: { turbo: false } do |f| %>
     <div class="form-group">
       <label for="log_text">Paste your game log:</label>
-      <%= text_area_tag :log_text, params[:log_text], rows: 10, class: "form-control", placeholder: "Paste Star Realms game log here..." %>
+      <%= text_area_tag :log_text, params[:log_text], rows: 15, class: "form-control", placeholder: "Paste Star Realms game log here..." %>
     </div>
     <div class="form-actions">
-      <%= submit_tag "Parse Game", class: "btn" %>
+      <%= submit_tag "Parse & Save Game", class: "btn" %>
     </div>
   <% end %>
 
-  <% if @result && @result.players.any? %>
-    <div class="results">
-      <h2>Game Results</h2>
-
-      <div class="summary">
-        <p><strong>Players:</strong> <%= @result.players.join(" vs ") %></p>
-        <p><strong>Total Turns:</strong> <%= @result.total_turns %></p>
-        <% if @result.winner %>
-          <p><strong>Winner:</strong> <%= @result.winner %></p>
-        <% else %>
-          <p><em>Game incomplete</em></p>
-        <% end %>
-        <% if @result.mission_game? %>
-          <p><strong>Game Mode:</strong> Missions</p>
-          <% @result.players.each do |player| %>
-            <% missions = @result.missions_by_turn[player] %>
-            <% if missions.any? %>
-              <p><strong><%= player %> Missions:</strong>
-                <%= missions.map { |turn, name| "#{name} (Turn #{turn})" }.join(", ") %>
-                (<%= missions.size %>/3)
-              </p>
-            <% end %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="authorityChart"></canvas>
-      </div>
-
-      <%= content_tag :script, nil,
-            type: "module",
-            data: {
-              chart_data: @result.authority_by_turn.to_json,
-              players: @result.players.to_json,
-              missions: @result.missions_by_turn.to_json
-            },
-            id: "chart-data" %>
-    </div>
-  <% elsif @result %>
+  <% if @result && @result.players.empty? %>
     <div class="error">
       <p>Could not parse game log. Make sure you paste the complete game output.</p>
     </div>
   <% end %>
+
+  <% if flash[:alert] %>
+    <div class="error">
+      <p><%= flash[:alert] %></p>
+    </div>
+  <% end %>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const dataEl = document.getElementById("chart-data");
-    if (dataEl) {
-      const chartData = JSON.parse(dataEl.dataset.chartData);
-      const players = JSON.parse(dataEl.dataset.players);
-      const missions = JSON.parse(dataEl.dataset.missions);
-
-      const colors = ["#3b82f6", "#ef4444"];
-
-      // Create a yellow star image for mission markers
-      const starSize = 28;
-      const starImage = new Image(starSize, starSize);
-      const starSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${starSize}" height="${starSize}" viewBox="0 0 24 24">
-          <path fill="#FFD700" stroke="#B8860B" stroke-width="1"
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>`;
-      starImage.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(starSvg);
-
-      // Calculate min authority across all players for y-axis
-      let minAuthority = 0;
-      players.forEach(player => {
-        const playerData = chartData[player];
-        playerData.forEach(([turn, authority]) => {
-          if (authority < minAuthority) minAuthority = authority;
-        });
-      });
-
-      // Build datasets for each player
-      const datasets = players.map((player, index) => {
-        const playerData = chartData[player];
-        return {
-          label: player,
-          data: playerData.map(([turn, authority]) => ({ x: turn, y: authority })),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          fill: false,
-          tension: 0.1
-        };
-      });
-
-      // Build mission marker datasets (yellow stars on correct points, rendered on top)
-      players.forEach((player, index) => {
-        const playerMissions = missions[player] || [];
-        if (playerMissions.length > 0) {
-          // Find authority at each mission turn
-          const playerData = chartData[player];
-          const missionPoints = playerMissions.map(([turn, missionName]) => {
-            // Find the authority at this turn (or closest prior)
-            const authorityAtTurn = playerData.find(([t, a]) => t === turn);
-            const authority = authorityAtTurn ? authorityAtTurn[1] : 50;
-            return { x: turn, y: authority, mission: missionName };
-          });
-
-          datasets.push({
-            label: `${player} Missions`,
-            data: missionPoints,
-            pointStyle: starImage,
-            pointRadius: starSize / 2,
-            pointHoverRadius: starSize / 2 + 4,
-            showLine: false,
-            type: "scatter",
-            order: -1 // Render on top of other datasets
-          });
-        }
-      });
-
-      const ctx = document.getElementById("authorityChart").getContext("2d");
-      new Chart(ctx, {
-        type: "line",
-        data: { datasets },
-        options: {
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: "Authority Over Time"
-            },
-            legend: {
-              position: "top",
-              labels: {
-                filter: function(item, chart) {
-                  // Hide mission datasets from legend
-                  return !item.text.includes("Missions");
-                }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  if (context.raw.mission) {
-                    return `${context.dataset.label.replace(" Missions", "")}: ${context.raw.mission} completed`;
-                  }
-                  return `${context.dataset.label}: ${context.raw.y} Authority`;
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              type: "linear",
-              title: {
-                display: true,
-                text: "Turn"
-              },
-              ticks: {
-                stepSize: 1
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: "Authority"
-              },
-              min: minAuthority
-            }
-          }
-        }
-      });
-    }
-  });
-</script>
 
 <style>
   .container {
@@ -191,9 +35,40 @@
     font-family: system-ui, -apple-system, sans-serif;
   }
 
-  h1 {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    margin: 0;
     color: #1f2937;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s;
+  }
+
+  .btn:hover {
+    background-color: #2563eb;
+  }
+
+  .btn-secondary {
+    background-color: #6b7280;
+  }
+
+  .btn-secondary:hover {
+    background-color: #4b5563;
   }
 
   .form-group {
@@ -225,43 +100,6 @@
 
   .form-actions {
     margin-top: 1rem;
-  }
-
-  .btn {
-    padding: 0.75rem 1.5rem;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.15s;
-  }
-
-  .btn:hover {
-    background-color: #2563eb;
-  }
-
-  .results {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .summary {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.375rem;
-  }
-
-  .summary p {
-    margin: 0.25rem 0;
-  }
-
-  .chart-container {
-    position: relative;
-    height: 400px;
   }
 
   .error {

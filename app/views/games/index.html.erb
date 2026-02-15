@@ -1,0 +1,128 @@
+<div class="container">
+  <div class="header">
+    <h1>Star Realms Tracker</h1>
+    <%= link_to "Parse New Game", new_game_path, class: "btn" %>
+  </div>
+
+  <% if @games.any? %>
+    <table class="games-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Players</th>
+          <th>Winner</th>
+          <th>Final Score</th>
+          <th>Turns</th>
+          <th>Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @games.each do |game| %>
+          <tr>
+            <td><%= link_to game.created_at.strftime("%b %d, %Y"), game %></td>
+            <td><%= game.player_1_name %> vs <%= game.player_2_name %></td>
+            <td>
+              <% if game.complete? %>
+                <strong><%= game.winner_name %></strong>
+              <% else %>
+                <em>Incomplete</em>
+              <% end %>
+            </td>
+            <td><%= game.final_score %></td>
+            <td><%= game.total_turns %></td>
+            <td><%= game.is_mission_game? ? "Missions" : "Standard" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="empty-state">
+      <p>No games recorded yet.</p>
+      <p><%= link_to "Parse your first game", new_game_path %></p>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    margin: 0;
+    color: #1f2937;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s;
+  }
+
+  .btn:hover {
+    background-color: #2563eb;
+  }
+
+  .games-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .games-table th,
+  .games-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .games-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .games-table tbody tr:hover {
+    background-color: #f9fafb;
+  }
+
+  .games-table a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .games-table a:hover {
+    text-decoration: underline;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    color: #6b7280;
+  }
+
+  .empty-state a {
+    color: #3b82f6;
+  }
+</style>
